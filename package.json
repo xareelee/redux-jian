@@ -1,0 +1,25 @@
+{
+  "name": "redux-jian",
+  "version": "0.1.0",
+  "description": "Simplify using Redux",
+  "author": "Xaree Lee <xareelee@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xareelee/redux-jian.git"
+  },
+  "keywords": [
+    "redux",
+    "redux-jian",
+    "jian"
+  ],
+  "main": "src/index.js",
+  "scripts": {},
+  "engines": {
+    "node": ">=4.0"
+  },
+  "dependencies": {
+    "immutable": "^3.8.1",
+    "redux": "^3.6.0"
+  }
+}
