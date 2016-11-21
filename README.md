@@ -1,4 +1,4 @@
-# Redux-Jian
+# Redux-Jian (Redux-ç°¡)
 
 [![GitHub version](https://img.shields.io/github/tag/xareelee/redux-jian.svg)](https://github.com/xareelee/redux-jian)
 [![npm version](https://img.shields.io/npm/v/redux-jian.svg?maxAge=86400)](https://www.npmjs.com/package/redux-jian)
@@ -14,10 +14,10 @@ Redux-Jian is a library aiming to simplify how to use Redux. **Jian (chinese: ç°
 
 ### Make an action
 
-`makeAction()` is a Redux action synthesizer. It simply wrap data in the key `payload`. If the data is an `Error` type, the value of `isError` will be `true`.
+`createAction()` is a Redux action synthesizer. It simply wrap data in the key `payload`. If the data is an `Error` type, the value of `isError` will be `true`.
 
 ```js
-const updateUsernameAction = makeAction(UPDATE_USERNAME, { username: name })
+const updateUsernameAction = createAction(UPDATE_USERNAME, { username: name })
 // same as
 const updateUsernameAction = {
   type: UPDATE_USERNAME,
@@ -36,16 +36,16 @@ Register a mutator:
 
 ```js
 // user.redux.js
-import { createMutator, action } from 'redux-jian';
+import { registerMutator, createAction } from 'redux-jian';
 
 const UPDATE_USERNAME = 'UPDATE_USERNAME';
 
 // simple mutator
-createMutator(UPDATE_USERNAME, (name) => {
+registerMutator(UPDATE_USERNAME, (name) => {
   if (name.length > 0) {
-    return makeAction(UPDATE_USERNAME, { username: name });
+    return createAction(UPDATE_USERNAME, { username: name });
   }
-  return makeAction(INPUT_INVALID_USERNAME);
+  return createAction(INPUT_INVALID_USERNAME);
 })
 
 // thunk mutator
@@ -76,24 +76,24 @@ Redux-Jian provides a way to bind mutators to a store:
 
 ```js
 // App.js
-import { bindMutatorsToDispatch } from 'redux-jian';
+import { bindMutatorsToStore } from 'redux-jian';
 
 const store = createStore(...);
-bindMutatorsToDispatch(store.dispatch);
+bindMutatorsToStore(store);
 ```
 
 Now you can use bound mutators directly:
 
 ```js
 // Signup.js (a React component)
-import { boundMutators } from 'redux-jian'
+import { getBoundMutators } from 'redux-jian'
 
-boundMutators('UPDATE_USERNAME')('John');
+getBoundMutators('UPDATE_USERNAME')('John');
 ```
 
 Why using bound mutators? In the standard Redux way, you need to use `mapDispatcherToProps()` and `connect()` to bind mutators to a dispatcher. This is redundant because there is only a store, and only a dispatcher, for the app states. All actions will only be sent to this store. This means that we could bind all mutators to the store only once and use them anywhere.
 
-You can choose to use `getMutator()` and dispatch it manually or just use `boundMutator()` to dispatch actions (or invoke the thunk) directly. 
+You can choose to use `getMutator()` and dispatch it manually or just use `getBoundMutators()` to dispatch actions (or invoke the thunk) directly. 
 
 
 
