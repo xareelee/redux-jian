@@ -24,7 +24,7 @@ const _action = (type, payload) => {
   return { type, payload, isError };  
 }
 
-const makeAction = (!shouldAsset) ? _action : (type, payload) => {
+const createAction = (!shouldAsset) ? _action : (type, payload) => {
   if (!(type instanceof String || typeof type === 'string')) {
     throw new Error(`'type' should be a String type. Which is '${type}'`);
   }
@@ -42,13 +42,13 @@ const makeAction = (!shouldAsset) ? _action : (type, payload) => {
  * reducers (pure functions), and the mutators are the places where you can
  * handle them.
  * 
- * The functions `createMutator` and `getMutator` allow you to decouple calling  
- * and implementation by passing a name string, `mutatorName`.
+ * The functions `registerMutator` and `getMutator` allow you to decouple calling  
+ * and implementation by passing a name string `mutatorName`.
  */
 
 const _Mutators = {};
 
-const _createMutator = (mutatorName, block) => {
+const _registerMutator = (mutatorName, block) => {
   return _Mutators[mutatorName] = block;
 };
 
@@ -58,7 +58,7 @@ const _getMutator = (mutatorName) => (...params) => {
 
 const _cloneMutators = (mutators) => Object.assign({}, mutators);
 
-const createMutator = (!shouldAsset) ? _createMutator : (mutatorName, block) => {
+const registerMutator = (!shouldAsset) ? _registerMutator : (mutatorName, block) => {
   if (!(mutatorName instanceof String || typeof mutatorName === 'string')) {
     throw new Error(`'mutatorName' should be a String type. Which is '${mutatorName}'`);
   }
@@ -68,12 +68,12 @@ const createMutator = (!shouldAsset) ? _createMutator : (mutatorName, block) => 
   if (_Mutators[mutatorName]) {
     throw new Error(`Mutator name '${mutatorName}' has been used. It should be unique.`);
   }
-  return _createMutator(mutatorName, block);
+  return _registerMutator(mutatorName, block);
 }
 
 const getMutator = (!shouldAsset) ? _getMutator : (mutatorName) => {
   if (!_Mutators[mutatorName]) {
-    throw new Error(`Mutator name '${mutatorName}' doesn't exist. It should be registed by 'createMutator()' before using.`);
+    throw new Error(`Mutator name '${mutatorName}' doesn't exist. It should be registed by 'registerMutator()' before using.`);
   }
   return _getMutator(mutatorName);
 }
@@ -88,7 +88,11 @@ const currentMutators = () => _cloneMutators(_Mutators);
 // The mutators which are bound to store's dispatch by `bindActionCreators`.
 let _boundMutators;
 
-const bindMutatorsToDispatch = (dispatch) => {
+const bindMutatorsToStore = (store) => {
+  const dispatch = store.dispatch;
+  if (!(dispatch instanceof Function || typeof dispatch === 'function')) {
+    throw new Error(`'store' should hava a function 'dispatch'.`);
+  }
   if (_boundMutators) {
     throw new Error(`Mutators have been bound. You can only bind mutators once.`);
   }
@@ -96,7 +100,7 @@ const bindMutatorsToDispatch = (dispatch) => {
   return _boundMutators;
 }
 
-const boundMutators = (mutatorName) => _boundMutators.get(mutatorName);
+const getBoundMutators = (mutatorName) => _boundMutators.get(mutatorName);
 
 
 
@@ -105,12 +109,12 @@ const boundMutators = (mutatorName) => _boundMutators.get(mutatorName);
 // -----------------------------------------------------------------------------
 
 module.exports = {
-  makeAction,
-  createMutator,
+  createAction,
+  registerMutator,
   getMutator,
   currentMutators,
-  bindMutatorsToDispatch,
-  boundMutators
+  bindMutatorsToStore,
+  getBoundMutators
 };
 
 
